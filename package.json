@@ -1,7 +1,7 @@
 {
-  "name": "{#PACKAGE_NAME#}",
-  "version": "{#PACKAGE_VERSION#}",
-  "description": "{#PACKAGE_DESCRIPTION#}",
+  "name": "@wezom/graphql-codegen-typescript-operations",
+  "version": "0.0.0-beta.1",
+  "description": "Preset generator from GraphQL operations to Typescript code",
   "main": "lib/index.js",
   "module": "lib/index.mjs",
   "types": "lib/index.d.ts",
@@ -17,7 +17,6 @@
     "lib"
   ],
   "scripts": {
-    "init": "node src/init/index.js && pnpm remove cp-cli from-cwd inquirer && del-cli src/init",
     "build": "rollup --config rollup.config.js",
     "prebuild": "del-cli lib",
     "postbuild": "del-cli lib/**/__specs__",
@@ -32,15 +31,15 @@
     "ci-test": "pnpm run lint && pnpm run test"
   },
   "keywords": [],
-  "author": "{#PACKAGE_AUTHOR_NAME#} <{#PACKAGE_AUTHOR_EMAIL#}>",
+  "author": "OlehDutchenko <dutchenko.o.dev@gmail.com>",
   "license": "BSD 3-Clause License",
   "bugs": {
-    "url": "{#REPO_URL#}/issues"
+    "url": "https://github.com/WezomCompany/graphql-codegen-typescript-operations/issues"
   },
-  "homepage": "{#REPO_URL#}#readme",
+  "homepage": "https://github.com/WezomCompany/graphql-codegen-typescript-operations#readme",
   "repository": {
     "type": "git",
-    "url": "git+{#REPO_URL#}.git"
+    "url": "git+https://github.com/WezomCompany/graphql-codegen-typescript-operations.git"
   },
   "publishConfig": {
     "access": "public"
@@ -51,13 +50,10 @@
     "@vitest/coverage-istanbul": "^0.34.1",
     "@wezom/eslint-config": "^11.0.5",
     "@wezom/eslint-config-ts": "^11.0.5",
-    "cp-cli": "^2.0.0",
     "del-cli": "^5.0.0",
     "eslint": "^8.46.0",
     "eslint-config-prettier": "^8.9.0",
-    "from-cwd": "^1.0.1",
     "glob": "^10.3.3",
-    "inquirer": "^8.2.6",
     "istanbul-badges-readme": "^1.8.5",
     "jsdom": "^22.1.0",
     "prettier": "^3.0.0",

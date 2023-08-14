@@ -45,6 +45,8 @@
     "access": "public"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.0",
+    "@graphql-codegen/plugin-helpers": "^5.0.1",
     "@rollup/plugin-terser": "^0.4.3",
     "@rollup/plugin-typescript": "^11.1.2",
     "@vitest/coverage-istanbul": "^0.34.1",
@@ -58,7 +60,12 @@
     "jsdom": "^22.1.0",
     "prettier": "^3.0.0",
     "rollup": "^3.27.0",
+    "tslib": "^2.6.1",
     "typescript": "^5.1.6",
     "vitest": "^0.34.1"
+  },
+  "peerDependencies": {
+    "@graphql-codegen/cli": "^5.0.0",
+    "@graphql-codegen/plugin-helpers": "^5.0.1"
   }
 }

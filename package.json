@@ -18,7 +18,7 @@
   ],
   "scripts": {
     "build": "rollup --config rollup.config.js",
-    "prebuild": "del-cli lib",
+    "prebuild": "del-cli lib && del-cli src/__specs__/__generated__/*.ts",
     "postbuild": "del-cli lib/**/__specs__",
     "prepublishOnly": "pnpm run build",
     "test": "vitest run",
@@ -29,7 +29,8 @@
     "format": "prettier \"./src/**/*.ts\" --write --check",
     "pr-ready": "pnpm run format && pnpm run lint-with-autofix && pnpm run test-with-coverage && pnpm run build",
     "ci-test": "pnpm run lint && pnpm run test",
-    "playground": "graphql-codegen --config ./playground/codegen.js"
+    "codegen": "graphql-codegen --config ./playground/codegen.js",
+    "build-and-codegen": "pnpm run build && pnpm run codegen"
   },
   "keywords": [],
   "author": "OlehDutchenko <dutchenko.o.dev@gmail.com>",

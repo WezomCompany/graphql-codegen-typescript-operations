@@ -6,8 +6,4 @@ const configurator = new SplitEnumsConfigurator({
 	outputDir: 'playground/__generated__',
 });
 
-const config = configurator.create();
-
-console.log(config);
-
-export default config;
+export default configurator.create();

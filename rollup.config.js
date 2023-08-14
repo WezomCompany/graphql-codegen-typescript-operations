@@ -1,4 +1,3 @@
-import terser from '@rollup/plugin-terser';
 import typescript from '@rollup/plugin-typescript';
 import { glob } from 'glob';
 import path from 'node:path';
@@ -31,6 +30,6 @@ export default {
 			entryFileNames: '[name].mjs',
 		},
 	],
-	plugins: [typescript(), terser()],
-	external: [],
+	plugins: [typescript()],
+	external: ['node:fs'],
 };

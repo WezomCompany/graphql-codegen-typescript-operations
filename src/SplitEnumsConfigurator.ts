@@ -12,7 +12,6 @@ export class SplitEnumsConfigurator {
 		this.outputDir = outputDir;
 		this.codegenConfig = codegeConfig;
 		this.patcher = new SplitEnumsPatcher({ outputDir });
-		this.afterAllFileWriteHook = this.afterAllFileWriteHook.bind(this);
 	}
 
 	protected getPluginForOperations(): Types.ConfiguredPlugin {
@@ -36,7 +35,7 @@ export class SplitEnumsConfigurator {
 	protected getHooks(): Types.ConfiguredPlugin['hooks'] {
 		const hooks = this.codegenConfig.hooks || {};
 		const afterAllFileWriteHooks: (string | Types.HookFunction)[] = [
-			this.afterAllFileWriteHook,
+			this.patcher.afterAllFileWriteHook,
 		];
 
 		if (Array.isArray(hooks.afterAllFileWrite)) {
@@ -61,10 +60,6 @@ export class SplitEnumsConfigurator {
 				[fileWithEnums]: this.getPluginForEnums(),
 			},
 		};
-	}
-
-	protected afterAllFileWriteHook(args: any): void {
-		console.log('afterAllFileWrite', args);
 	}
 }
 

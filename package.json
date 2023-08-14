@@ -1,5 +1,5 @@
 {
-  "name": "@wezom/graphql-codegen-typescript-operations",
+  "name": "@wezom/graphql-codegen-configurator",
   "version": "0.0.0-beta.1",
   "description": "Preset generator from GraphQL operations to Typescript code",
   "main": "lib/index.js",
@@ -34,12 +34,12 @@
   "author": "OlehDutchenko <dutchenko.o.dev@gmail.com>",
   "license": "BSD 3-Clause License",
   "bugs": {
-    "url": "https://github.com/WezomCompany/graphql-codegen-typescript-operations/issues"
+    "url": "https://github.com/WezomCompany/graphql-codegen-configurator/issues"
   },
-  "homepage": "https://github.com/WezomCompany/graphql-codegen-typescript-operations#readme",
+  "homepage": "https://github.com/WezomCompany/graphql-codegen-configurator#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/WezomCompany/graphql-codegen-typescript-operations.git"
+    "url": "git+https://github.com/WezomCompany/graphql-codegen-configurator.git"
   },
   "publishConfig": {
     "access": "public"

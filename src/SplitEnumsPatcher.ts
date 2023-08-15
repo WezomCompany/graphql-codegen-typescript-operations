@@ -20,36 +20,54 @@ export class SplitEnumsPatcher {
 	}
 
 	afterAllFileWriteHook(): void {
-		this.writeIndexFile();
-		this.rewriteEnumFile();
-		this.rewriteOperationFile();
+		const {
+			operations: operationsFile,
+			enums: enumsFile,
+			index: indexFile,
+		} = this.getFilePaths();
+		const content = this.readOperationsFile(operationsFile);
+		const enums = this.getEnums(content);
+
+		this.writeIndexFile(indexFile);
+		this.writeEnumsFile(enumsFile, enums);
+		this.rewriteOperationsFile(operationsFile, content, enums);
 	}
 
-	protected writeIndexFile(): void {
-		const { index } = this.getFilePaths();
+	protected readOperationsFile(filename: string): string {
+		return fs.readFileSync(filename, 'utf-8');
+	}
+
+	protected writeIndexFile(filename: string): void {
 		const content = [
 			this.exports('*', this.enums),
 			this.exports('*', this.operations),
 		].join('');
-		fs.writeFileSync(index, content, 'utf-8');
+		fs.writeFileSync(filename, content, 'utf-8');
 	}
 
-	// todo implement
-	protected rewriteOperationFile(): void {
-		const { operations } = this.getFilePaths();
-		const content = fs.readFileSync(operations, 'utf-8');
-		console.log('rewriteOperationFile', operations, content);
+	protected writeEnumsFile(filename: string, enums: Enum[]): void {
+		const content = enums.map(({ source }) => source).join('\n\n') + '\n';
+		fs.writeFileSync(filename, content, 'utf-8');
 	}
 
-	protected rewriteEnumFile(): void {
-		const { enums: enumsFile } = this.getFilePaths();
-		const content = fs.readFileSync(enumsFile, 'utf-8');
-		const enums =
-			this.getEnums(content)
-				.map(({ source }) => source)
-				.join('\n\n') + '\n';
+	protected rewriteOperationsFile(
+		filename: string,
+		content: string,
+		enums: Enum[]
+	): void {
+		const enumsImports: string[] = enums.map(({ name }) => name);
+		enums.forEach(({ name, source }) => {
+			content = content.replace(source, '');
+		});
 
-		fs.writeFileSync(enumsFile, enums, 'utf-8');
+		const imports =
+			enumsImports.length === 0
+				? ''
+				: `import type { ${enumsImports.join(', ')} } from './${
+						this.enums
+				  }';\n`;
+
+		fs.writeFileSync(filename, imports + content, 'utf-8');
 	}
 
 	protected getEnums(content: string): Enum[] {

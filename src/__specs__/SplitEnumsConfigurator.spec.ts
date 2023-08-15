@@ -17,13 +17,8 @@ describe('SplitEnumsConfigurator', () => {
 					'output/operations.ts': {
 						plugins: ['typescript', 'typescript-operations'],
 						config: {
+							declarationKind: 'interface',
 							onlyOperationTypes: true,
-						},
-					},
-					'output/enums.ts': {
-						plugins: ['typescript', 'typescript-operations'],
-						config: {
-							onlyEnums: true,
 						},
 					},
 				},

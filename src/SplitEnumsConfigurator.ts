@@ -18,16 +18,8 @@ export class SplitEnumsConfigurator {
 		return {
 			plugins: ['typescript', 'typescript-operations'],
 			config: {
+				declarationKind: 'interface',
 				onlyOperationTypes: true,
-			},
-		};
-	}
-
-	protected getPluginForEnums(): Types.ConfiguredPlugin {
-		return {
-			plugins: ['typescript', 'typescript-operations'],
-			config: {
-				onlyEnums: true,
 			},
 		};
 	}
@@ -49,15 +41,13 @@ export class SplitEnumsConfigurator {
 	}
 
 	create(): CodegenConfig {
-		const { operations: fileWithOperations, enums: fileWithEnums } =
-			this.patcher.getFilePaths();
+		const { operations: fileWithOperations } = this.patcher.getFilePaths();
 
 		return {
 			...this.codegenConfig,
 			hooks: this.getHooks(),
 			generates: {
 				[fileWithOperations]: this.getPluginForOperations(),
-				[fileWithEnums]: this.getPluginForEnums(),
 			},
 		};
 	}

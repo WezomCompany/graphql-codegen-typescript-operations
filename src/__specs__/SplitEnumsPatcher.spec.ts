@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { SplitEnumsPatcher } from '../SplitEnumsPatcher';
+import { fixtures } from './fixtures';
 
 describe('SplitEnumsPatcher', () => {
 	const outputDir = 'src/__specs__/__generated__';
@@ -10,8 +11,8 @@ describe('SplitEnumsPatcher', () => {
 
 	beforeEach(() => {
 		fs.writeFileSync(indexFile, '', 'utf-8');
-		fs.writeFileSync(enumsFile, '', 'utf-8');
 		fs.writeFileSync(operationsFile, '', 'utf-8');
+		fs.writeFileSync(enumsFile, '', 'utf-8');
 	});
 
 	it('should provide file paths', () => {
@@ -28,62 +29,56 @@ describe('SplitEnumsPatcher', () => {
 		});
 	});
 
-	it('should write index file as a result of `afterAllFileWrite` hook', () => {
-		if (fs.existsSync(indexFile)) {
-			fs.unlinkSync(indexFile);
+	fixtures.forEach(
+		({
+			name,
+			operationSource,
+			operationExpectedResult,
+			enumsExpectedResult,
+		}) => {
+			describe(name, () => {
+				it('should write index file during `afterAllFileWrite` hook', () => {
+					if (fs.existsSync(indexFile)) {
+						fs.unlinkSync(indexFile);
+					}
+
+					const patcher = new SplitEnumsPatcher({
+						outputDir,
+					});
+					patcher.afterAllFileWriteHook();
+
+					expect(fs.existsSync(indexFile)).toBe(true);
+					expect(fs.readFileSync(indexFile, 'utf-8').trim()).toBe(
+						"export * from './enums';\nexport * from './operations';"
+					);
+				});
+
+				it('should write enums file during `afterAllFileWrite` hook', () => {
+					fs.writeFileSync(operationsFile, operationSource, 'utf-8');
+
+					const patcher = new SplitEnumsPatcher({
+						outputDir,
+					});
+					patcher.afterAllFileWriteHook();
+
+					const result = fs.readFileSync(enumsFile, 'utf-8').trim();
+					expect(result).toBe(enumsExpectedResult.trim());
+				});
+
+				it('should rewrite enums file during `afterAllFileWrite` hook', () => {
+					fs.writeFileSync(operationsFile, operationSource, 'utf-8');
+
+					const patcher = new SplitEnumsPatcher({
+						outputDir,
+					});
+					patcher.afterAllFileWriteHook();
+
+					const result = fs
+						.readFileSync(operationsFile, 'utf-8')
+						.trim();
+					expect(result).toBe(operationExpectedResult.trim());
+				});
+			});
 		}
-
-		const patcher = new SplitEnumsPatcher({
-			outputDir,
-		});
-		patcher.afterAllFileWriteHook();
-
-		expect(fs.existsSync(indexFile)).toBe(true);
-		expect(fs.readFileSync(indexFile, 'utf-8').trim()).toBe(
-			"export * from './enums';\nexport * from './operations';"
-		);
-	});
-
-	it('should rewrite enums file during `afterAllFileWrite` hook', () => {
-		fs.writeFileSync(
-			enumsFile,
-			`
-export enum Unused {
-  Bar = 'BAR',
-  Foo = 'FOO'
-}
-
-export type FindUserQueryVariables = Exact<{
-  userId: Scalars['ID']['input'];
-}>;
-
-export enum Role {
-  Admin = 'ADMIN',
-  User = 'USER'
-}
-
-
-export type FindUserQuery = { __typename?: 'Query', user?: { __typename?: 'User', id: string, username: string, role: Role } | null };
-
-export type UserFieldsFragment = { __typename?: 'User', id: string, username: string, role: Role };
-`,
-			'utf-8'
-		);
-
-		const patcher = new SplitEnumsPatcher({
-			outputDir,
-		});
-		patcher.afterAllFileWriteHook();
-
-		expect(fs.readFileSync(enumsFile, 'utf-8').trim())
-			.toBe(`export enum Role {
-  Admin = 'ADMIN',
-  User = 'USER'
-}
-
-export enum Unused {
-  Bar = 'BAR',
-  Foo = 'FOO'
-}`);
-	});
+	);
 });

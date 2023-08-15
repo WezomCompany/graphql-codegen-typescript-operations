@@ -11,7 +11,8 @@ export class SplitEnumsPatcher {
 	}
 
 	getFilePaths(): Record<'operations' | 'enums' | 'index', string> {
-		const path = (file: string): string => `${this.outputDir}/${file}.ts`;
+		const output = this.outputDir.replace(/(\/)+$/, '');
+		const path = (file: string): string => `${output}/${file}.ts`;
 		return {
 			operations: path(this.operations),
 			enums: path(this.enums),
@@ -46,8 +47,11 @@ export class SplitEnumsPatcher {
 	}
 
 	protected writeEnumsFile(filename: string, enums: Enum[]): void {
-		const content = enums.map(({ source }) => source).join('\n\n') + '\n';
-		fs.writeFileSync(filename, content, 'utf-8');
+		const content =
+			enums.length > 0
+				? enums.map(({ source }) => source).join('\n\n')
+				: 'export {};';
+		fs.writeFileSync(filename, content + '\n', 'utf-8');
 	}
 
 	protected rewriteOperationsFile(
@@ -65,7 +69,7 @@ export class SplitEnumsPatcher {
 				? ''
 				: `import type { ${enumsImports.join(', ')} } from './${
 						this.enums
-				  }';\n`;
+				  }';\n\n`;
 
 		fs.writeFileSync(filename, imports + content, 'utf-8');
 	}
@@ -77,14 +81,12 @@ export class SplitEnumsPatcher {
 
 		let match = regExp.exec(content);
 		while (match !== null) {
-			const [source = '', , , , name] = match || [];
+			const [source, , , , name] = match;
 			enums.push({ name, source });
 			match = regExp.exec(content);
 		}
 
-		return enums
-			.filter(({ source }) => source.length > 0)
-			.sort((a, b) => a.name.localeCompare(b.name));
+		return enums.sort((a, b) => a.name.localeCompare(b.name));
 	}
 
 	protected exports(entity: string, file: string): string {

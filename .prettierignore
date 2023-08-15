@@ -1,3 +1,4 @@
 package.json
 pnpm-lock.yaml
 node_modules
+src/__specs__/__generated__/*

@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, beforeEach, describe, expect, it } from 'vitest';
 import { SplitEnumsPatcher } from '../SplitEnumsPatcher';
 import { fixtures } from './fixtures';
 
@@ -15,6 +15,17 @@ describe('SplitEnumsPatcher', () => {
 		fs.writeFileSync(enumsFile, '', 'utf-8');
 	});
 
+	afterAll(() => {
+		_remove(indexFile);
+		_remove(operationsFile);
+		_remove(enumsFile);
+		function _remove(file: string): void {
+			if (fs.existsSync(file)) {
+				fs.unlinkSync(file);
+			}
+		}
+	});
+
 	it('should provide file paths', () => {
 		const patcher = new SplitEnumsPatcher({
 			outputDir,
@@ -26,6 +37,20 @@ describe('SplitEnumsPatcher', () => {
 			operations: operationsFile,
 			enums: enumsFile,
 			index: indexFile,
+		});
+	});
+
+	it('should trim slashes from output dir', () => {
+		const patcher = new SplitEnumsPatcher({
+			outputDir: 'output/',
+		});
+
+		const filePaths = patcher.getFilePaths();
+
+		expect(filePaths).toEqual({
+			operations: 'output/operations.ts',
+			enums: 'output/enums.ts',
+			index: 'output/index.ts',
 		});
 	});
 

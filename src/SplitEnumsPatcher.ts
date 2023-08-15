@@ -41,11 +41,32 @@ export class SplitEnumsPatcher {
 		console.log('rewriteOperationFile', operations, content);
 	}
 
-	// todo implement
 	protected rewriteEnumFile(): void {
-		const { enums } = this.getFilePaths();
-		const content = fs.readFileSync(enums, 'utf-8');
-		console.log('rewriteEnumFile', enums, content);
+		const { enums: enumsFile } = this.getFilePaths();
+		const content = fs.readFileSync(enumsFile, 'utf-8');
+		const enums =
+			this.getEnums(content)
+				.map(({ source }) => source)
+				.join('\n\n') + '\n';
+
+		fs.writeFileSync(enumsFile, enums, 'utf-8');
+	}
+
+	protected getEnums(content: string): Enum[] {
+		const enums: Enum[] = [];
+		const regExp =
+			/(((\/\/.+\r?\n)+)?export enum (\w+) ((.|\r?\n)(?!\r?\n\s*}))+.\r?\n\s*})/gm;
+
+		let match = regExp.exec(content);
+		while (match !== null) {
+			const [source = '', , , , name] = match || [];
+			enums.push({ name, source });
+			match = regExp.exec(content);
+		}
+
+		return enums
+			.filter(({ source }) => source.length > 0)
+			.sort((a, b) => a.name.localeCompare(b.name));
 	}
 
 	protected exports(entity: string, file: string): string {
@@ -55,4 +76,9 @@ export class SplitEnumsPatcher {
 
 interface Options {
 	outputDir: string;
+}
+
+interface Enum {
+	name: string;
+	source: string;
 }

@@ -30,6 +30,11 @@ type User implements Node {
 	role: Role!
 }
 
+enum Unused {
+	FOO
+	BAR
+}
+
 type Chat implements Node {
 	id: ID!
 	users: [User!]!
@@ -41,4 +46,21 @@ type ChatMessage implements Node {
 	content: String!
 	time: Date!
 	user: User!
+}
+
+type Mutation {
+	loginByCredentials(credentials: CredentialInput!): String!
+}
+
+input CredentialInput {
+	username: String!
+	password: String!
+}
+
+type TokenType {
+	token_type: String!
+	access_token: String!
+	refresh_token: String!
+	access_expires_in: Float!
+	refresh_expires_in: Float!
 }

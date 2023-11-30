@@ -6,12 +6,15 @@ export class SplitEnumsConfigurator {
 	protected readonly outputDir: string;
 	protected readonly codegenConfig: BaseCodegenConfig;
 	protected readonly patcher: SplitEnumsPatcher;
+	protected readonly pluginConfig: Types.ConfiguredPlugin;
 
 	constructor(options: Options) {
-		const { outputDir, ...codegeConfig } = options;
+		const { outputDir, pluginConfig, fileNameForTypes, ...codegenConfig } =
+			options;
 		this.outputDir = outputDir;
-		this.codegenConfig = codegeConfig;
-		this.patcher = new SplitEnumsPatcher({ outputDir });
+		this.codegenConfig = codegenConfig;
+		this.patcher = new SplitEnumsPatcher({ outputDir, fileNameForTypes });
+		this.pluginConfig = pluginConfig || {};
 	}
 
 	protected getPluginForOperations(): Types.ConfiguredPlugin {
@@ -20,6 +23,7 @@ export class SplitEnumsConfigurator {
 			config: {
 				declarationKind: 'interface',
 				onlyOperationTypes: true,
+				...this.pluginConfig,
 			},
 		};
 	}
@@ -56,4 +60,6 @@ export class SplitEnumsConfigurator {
 type BaseCodegenConfig = Omit<CodegenConfig, 'generates'>;
 interface Options extends BaseCodegenConfig {
 	outputDir: string;
+	fileNameForTypes?: string;
+	pluginConfig?: Types.ConfiguredPlugin;
 }

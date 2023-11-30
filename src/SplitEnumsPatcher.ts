@@ -3,10 +3,11 @@ import fs from 'node:fs';
 export class SplitEnumsPatcher {
 	protected readonly outputDir: string;
 	protected readonly enums: string = 'enums';
-	protected readonly operations: string = 'operations';
+	protected readonly operations: string;
 
 	constructor(options: Options) {
 		this.outputDir = options.outputDir;
+		this.operations = options.fileNameForTypes || 'operations';
 		this.afterAllFileWriteHook = this.afterAllFileWriteHook.bind(this);
 	}
 
@@ -96,6 +97,7 @@ export class SplitEnumsPatcher {
 
 interface Options {
 	outputDir: string;
+	fileNameForTypes?: string;
 }
 
 interface Enum {

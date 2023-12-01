@@ -4,10 +4,12 @@ export class SplitEnumsPatcher {
 	protected readonly outputDir: string;
 	protected readonly enums: string = 'enums';
 	protected readonly operations: string;
+	protected readonly noRootIndexFile: boolean;
 
 	constructor(options: Options) {
 		this.outputDir = options.outputDir;
 		this.operations = options.fileNameForTypes || 'operations';
+		this.noRootIndexFile = options.noRootIndexFile || false;
 		this.afterAllFileWriteHook = this.afterAllFileWriteHook.bind(this);
 	}
 
@@ -30,7 +32,7 @@ export class SplitEnumsPatcher {
 		const content = this.readOperationsFile(operationsFile);
 		const enums = this.getEnums(content);
 
-		this.writeIndexFile(indexFile);
+		!this.noRootIndexFile && this.writeIndexFile(indexFile);
 		this.writeEnumsFile(enumsFile, enums);
 		this.rewriteOperationsFile(operationsFile, content, enums);
 	}
@@ -95,9 +97,10 @@ export class SplitEnumsPatcher {
 	}
 }
 
-interface Options {
+export interface Options {
 	outputDir: string;
 	fileNameForTypes?: string;
+	noRootIndexFile?: boolean;
 }
 
 interface Enum {

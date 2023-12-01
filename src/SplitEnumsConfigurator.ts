@@ -1,28 +1,45 @@
+import type { AddPluginConfig } from '@graphql-codegen/add/typings/config';
 import type { CodegenConfig } from '@graphql-codegen/cli';
 import type { Types } from '@graphql-codegen/plugin-helpers';
-import { SplitEnumsPatcher } from './SplitEnumsPatcher';
+import {
+	SplitEnumsPatcher,
+	Options as SplitEnumsPatcherOptions,
+} from './SplitEnumsPatcher';
 
 export class SplitEnumsConfigurator {
 	protected readonly outputDir: string;
 	protected readonly codegenConfig: BaseCodegenConfig;
 	protected readonly patcher: SplitEnumsPatcher;
-	protected readonly pluginConfig: Types.ConfiguredPlugin;
+	protected readonly pluginConfig: Types.PluginConfig;
+	protected readonly addContent: AddPluginConfig[];
 
 	constructor(options: Options) {
-		const { outputDir, pluginConfig, fileNameForTypes, ...codegenConfig } =
-			options;
+		const {
+			outputDir,
+			pluginConfig,
+			patcherConfig = {},
+			addContent,
+			...codegenConfig
+		} = options;
 		this.outputDir = outputDir;
 		this.codegenConfig = codegenConfig;
-		this.patcher = new SplitEnumsPatcher({ outputDir, fileNameForTypes });
+		this.patcher = new SplitEnumsPatcher({ outputDir, ...patcherConfig });
 		this.pluginConfig = pluginConfig || {};
+		this.addContent = addContent || [];
 	}
 
 	protected getPluginForOperations(): Types.ConfiguredPlugin {
 		return {
-			plugins: ['typescript', 'typescript-operations'],
+			plugins: [
+				'graphql-codegen-typescript-operation-types',
+				'typescript-operations',
+				...this.addContent.map((content) => ({ add: content })),
+			],
 			config: {
 				declarationKind: 'interface',
 				onlyOperationTypes: true,
+				omitObjectTypes: true,
+				preResolveTypes: true,
 				...this.pluginConfig,
 			},
 		};
@@ -60,6 +77,7 @@ export class SplitEnumsConfigurator {
 type BaseCodegenConfig = Omit<CodegenConfig, 'generates'>;
 interface Options extends BaseCodegenConfig {
 	outputDir: string;
-	fileNameForTypes?: string;
-	pluginConfig?: Types.ConfiguredPlugin;
+	patcherConfig?: Omit<SplitEnumsPatcherOptions, 'outputDir'>;
+	pluginConfig?: Types.PluginConfig;
+	addContent?: AddPluginConfig[];
 }

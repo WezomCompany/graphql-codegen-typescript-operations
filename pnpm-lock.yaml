@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 devDependencies:
+  '@graphql-codegen/add':
+    specifier: ^5.0.0
+    version: 5.0.0(graphql@16.8.0)
   '@graphql-codegen/cli':
     specifier: ^5.0.0
     version: 5.0.0(graphql@16.8.0)
@@ -41,6 +44,9 @@ devDependencies:
   glob:
     specifier: ^10.3.3
     version: 10.3.3
+  graphql-codegen-typescript-operation-types:
+    specifier: ^2.0.1
+    version: 2.0.1(graphql@16.8.0)
   istanbul-badges-readme:
     specifier: ^1.8.5
     version: 1.8.5
@@ -976,6 +982,16 @@ packages:
   /@eslint/js@8.46.0:
     resolution: {integrity: sha512-a8TLtmPi8xzPkCbp/OGFUo5yhRkHM2Ko9kOWP4znJr0WAhWyThaw3PnwX4vOTWOAMsV2uRt32PPDcEz63esSaA==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+    dev: true
+
+  /@graphql-codegen/add@5.0.0(graphql@16.8.0):
+    resolution: {integrity: sha512-ynWDOsK2yxtFHwcJTB9shoSkUd7YXd6ZE57f0nk7W5cu/nAgxZZpEsnTPEpZB/Mjf14YRGe2uJHQ7AfElHjqUQ==}
+    peerDependencies:
+      graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
+    dependencies:
+      '@graphql-codegen/plugin-helpers': 5.0.1(graphql@16.8.0)
+      graphql: 16.8.0
+      tslib: 2.5.3
     dev: true
 
   /@graphql-codegen/cli@5.0.0(graphql@16.8.0):
@@ -3487,6 +3503,20 @@ packages:
 
   /graphemer@1.4.0:
     resolution: {integrity: sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==}
+    dev: true
+
+  /graphql-codegen-typescript-operation-types@2.0.1(graphql@16.8.0):
+    resolution: {integrity: sha512-uhF0+Qiy/PwJD5AURtzXGnB3hKBy+3MHR8M2p+UqAoAqYy/SJ1tEKgzDPijgWKItBNr3DWO6f+w2PF6B0DGEnA==}
+    engines: {node: '>=16'}
+    peerDependencies:
+      graphql: ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
+    dependencies:
+      '@graphql-codegen/plugin-helpers': 5.0.1(graphql@16.8.0)
+      '@graphql-codegen/typescript': 4.0.1(graphql@16.8.0)
+      graphql: 16.8.0
+    transitivePeerDependencies:
+      - encoding
+      - supports-color
     dev: true
 
   /graphql-config@5.0.2(graphql@16.8.0):

@@ -15,10 +15,70 @@ describe('SplitEnumsConfigurator', () => {
 				schema: 'schema.graphql',
 				generates: {
 					'output/operations.ts': {
-						plugins: ['typescript', 'typescript-operations'],
+						plugins: [
+							'graphql-codegen-typescript-operation-types',
+							'typescript-operations',
+						],
 						config: {
 							declarationKind: 'interface',
 							onlyOperationTypes: true,
+							omitObjectTypes: true,
+							preResolveTypes: true,
+						},
+					},
+				},
+			})
+		);
+	});
+
+	it('should create codegen configuration with additional content', () => {
+		const configurator = new SplitEnumsConfigurator({
+			schema: 'schema.graphql',
+			outputDir: 'output',
+			addContent: [
+				{
+					content: 'content 1',
+				},
+				{
+					content: 'content 2',
+					placement: 'append',
+				},
+			],
+			pluginConfig: {
+				option1: 'test',
+				option2: true,
+				option3: { test: 2 },
+			},
+		});
+
+		const config = configurator.create();
+
+		expect(config).toEqual(
+			expect.objectContaining({
+				schema: 'schema.graphql',
+				generates: {
+					'output/operations.ts': {
+						plugins: [
+							'graphql-codegen-typescript-operation-types',
+							'typescript-operations',
+							{
+								add: { content: 'content 1' },
+							},
+							{
+								add: {
+									content: 'content 2',
+									placement: 'append',
+								},
+							},
+						],
+						config: {
+							declarationKind: 'interface',
+							onlyOperationTypes: true,
+							omitObjectTypes: true,
+							preResolveTypes: true,
+							option1: 'test',
+							option2: true,
+							option3: { test: 2 },
 						},
 					},
 				},

@@ -5,21 +5,29 @@ export class SplitEnumsPatcher {
 	protected readonly enums: string = 'enums';
 	protected readonly operations: string;
 	protected readonly noRootIndexFile: boolean;
+	protected readonly splitEnums: boolean;
 
 	constructor(options: Options) {
 		this.outputDir = options.outputDir;
 		this.operations = options.fileNameForTypes || 'operations';
 		this.noRootIndexFile = options.noRootIndexFile || false;
+		this.splitEnums = options.splitEnums || false;
 		this.afterAllFileWriteHook = this.afterAllFileWriteHook.bind(this);
 	}
 
-	getFilePaths(): Record<'operations' | 'enums' | 'index', string> {
+	protected getPath(name: string, path?: string, isFile = true): string {
 		const output = this.outputDir.replace(/(\/)+$/, '');
-		const path = (file: string): string => `${output}/${file}.ts`;
+
+		const _path = path ? `/${path.replace(/(\/)+$/, '')}` : '';
+
+		return `${output + _path}/${name}${isFile ? '.ts' : ''}`;
+	}
+
+	getFilePaths(): Record<'operations' | 'enums' | 'index', string> {
 		return {
-			operations: path(this.operations),
-			enums: path(this.enums),
-			index: path('index'),
+			operations: this.getPath(this.operations),
+			enums: this.getPath(this.enums),
+			index: this.getPath('index'),
 		};
 	}
 
@@ -33,7 +41,11 @@ export class SplitEnumsPatcher {
 		const enums = this.getEnums(content);
 
 		!this.noRootIndexFile && this.writeIndexFile(indexFile);
-		this.writeEnumsFile(enumsFile, enums);
+		if (this.splitEnums) {
+			this.writeEnumsDirectory(enums);
+		} else {
+			this.writeEnumsFile(enumsFile, enums);
+		}
 		this.rewriteOperationsFile(operationsFile, content, enums);
 	}
 
@@ -55,6 +67,38 @@ export class SplitEnumsPatcher {
 				? enums.map(({ source }) => source).join('\n\n')
 				: 'export {};';
 		fs.writeFileSync(filename, content + '\n', 'utf-8');
+	}
+
+	protected writeEnumsDirectory(enums: Enum[]): void {
+		try {
+			const enumsDir = this.getPath(this.enums, undefined, false);
+
+			if (fs.existsSync(enumsDir)) {
+				fs.rmdirSync(enumsDir, { recursive: true });
+			}
+
+			fs.mkdirSync(enumsDir);
+
+			enums.forEach(({ name, source }) => {
+				fs.writeFileSync(
+					this.getPath(name, this.enums),
+					source,
+					'utf-8'
+				);
+			});
+
+			fs.writeFileSync(
+				this.getPath('index', this.enums),
+				enums.length
+					? enums
+							.map(({ name }) => `export * from './${name}';`)
+							.join('\n')
+					: 'export {};',
+				'utf-8'
+			);
+		} catch (e) {
+			console.log(e);
+		}
 	}
 
 	protected rewriteOperationsFile(
@@ -101,6 +145,7 @@ export interface Options {
 	outputDir: string;
 	fileNameForTypes?: string;
 	noRootIndexFile?: boolean;
+	splitEnums?: boolean;
 }
 
 interface Enum {
